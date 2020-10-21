@@ -27,23 +27,14 @@ interface CacheInterface
     public function flush(string $cacheType);
 
     /**
-     * @param string $categoryIds
      * @return string[]
      * @api
      */
-    public function flushCategoriesById(string $categoryIds);
+    public function flushCategories();
 
     /**
-     * @param string $productIds
      * @return string[]
      * @api
      */
-    public function flushProductsById(string $productIds = '');
-
-    /**
-     * @param string $skus
-     * @return string[]
-     * @api
-     */
-    public function flushProductsBySku(string $skus = '');
+    public function flushProducts();
 }

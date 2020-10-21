@@ -25,19 +25,4 @@ interface ReindexInterface
      * @return string[]
      */
     public function reindex(string $indexName);
-
-    /**
-     * @param string $indexName
-     * @param string $ids
-     * @return string[]
-     * @api
-     */
-    public function reindexById(string $indexName, string $ids = '');
-
-    /**
-     * @param string $indexName
-     * @param string $skus
-     * @return string[]
-     */
-    public function reindexBySku(string $indexName, string $skus = '');
 }

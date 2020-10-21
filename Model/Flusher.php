@@ -6,6 +6,7 @@ use Elgentos\ApiCacheIndexManagement\Api\CacheInterface;
 use Exception;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Framework\App\Cache\TypeListInterface;
+use Magento\Framework\App\Request\Http;
 use Magento\Framework\Model\Context;
 
 /**
@@ -23,6 +24,10 @@ class Flusher implements CacheInterface
      */
     public $productCollectionFactory;
     /**
+     * @var Http
+     */
+    public $request;
+    /**
      * @var TypeListInterface
      */
     protected $cacheTypeList;
@@ -32,20 +37,23 @@ class Flusher implements CacheInterface
     protected $_cacheTypeList;
 
     /**
-     * @param \Magento\Framework\Model\Context $context
-     * @param \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList
+     * @param Context $context
+     * @param TypeListInterface $cacheTypeList
      * @param \Magento\Framework\App\CacheInterface $appCache
-     * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory
+     * @param CollectionFactory $productCollectionFactory
+     * @param Http $request
      */
     public function __construct(
         Context $context,
         TypeListInterface $cacheTypeList,
         \Magento\Framework\App\CacheInterface $appCache,
-        CollectionFactory $productCollectionFactory
+        CollectionFactory $productCollectionFactory,
+        Http $request
     ) {
         $this->_cacheTypeList = $cacheTypeList;
         $this->appCache = $appCache;
         $this->productCollectionFactory = $productCollectionFactory;
+        $this->request = $request;
     }
 
     /**
@@ -65,83 +73,26 @@ class Flusher implements CacheInterface
     }
 
     /**
-     * @param string $type
-     * @param string $ids
-     * @return string[]
-     */
-    private function flushById(string $type, string $ids = '')
-    {
-        if (is_string($ids)) {
-            $ids = array_map(function ($id) {
-                return intval(trim($id));
-            }, explode(',', $ids));
-        }
-
-        $tags = array_map(function ($productId) use ($type) {
-            return 'catalog_' . $type . '_' . $productId;
-        }, $ids);
-
-        if (count($tags)) {
-            try {
-                $this->appCache->clean($tags);
-                return [
-                    'code' => '200',
-                    'message' => 'Cache clean successfully',
-                ];
-            } catch (Exception $e) {
-                return [
-                    'code' => '500',
-                    'message' => 'Could not clean cache; ' . $e->getMessage(),
-                ];
-            }
-        } else {
-            return [
-                'code' => '304',
-                'message' => 'No tags to clean',
-            ];
-        }
-    }
-
-    /**
      * @param string $categoryIds
      * @return string[]
      * @api
      */
-    public function flushCategoriesById(string $categoryIds = '')
+    public function flushCategories()
     {
-        return $this->flushById('category', $categoryIds);
+        return $this->flushById('category', $this->request->getPostValue('ids') ?: []);
     }
 
     /**
-     * @param string $productIds
      * @return string[]
      * @api
      */
-    public function flushProductsById(string $productIds = '')
+    public function flushProducts()
     {
+        $productIds = $this->request->getPostValue('ids') ?: [];
+        if ($this->request->getPostValue('skus')) {
+            $productIds = $this->getProductIdsBySku($this->request->getPostValue('skus'));
+        }
         return $this->flushById('product', $productIds);
-    }
-
-    /**
-     * @param string $skus
-     * @return string[]
-     * @api
-     */
-    public function flushProductsBySku(string $skus = '')
-    {
-        if (is_string($skus)) {
-            $skus = array_map(function ($id) {
-                return trim($id);
-            }, explode(',', $skus));
-        }
-
-        $productIds = [];
-        if (count($skus)) {
-            $productCollection = $this->productCollectionFactory->create();
-            $productIds = $productCollection->addFieldToFilter('sku', ['in' => $skus])->getColumnValues('entity_id');
-        }
-
-        return $this->flushProductsById(implode(',', $productIds));
     }
 
     /**
@@ -177,6 +128,66 @@ class Flusher implements CacheInterface
             return [
                 'code' => '304',
                 'message' => 'Already cleaned cache',
+            ];
+        }
+    }
+
+    /**
+     * @param mixed $skus
+     * @return string[]
+     * @api
+     */
+    private function getProductIdsBySku($skus)
+    {
+        if (is_string($skus)) {
+            $skus = array_map(function ($id) {
+                return trim($id);
+            }, explode(',', $skus));
+        }
+
+        $productIds = [];
+        if (count($skus)) {
+            $productCollection = $this->productCollectionFactory->create();
+            $productIds = $productCollection->addFieldToFilter('sku', ['in' => $skus])->getColumnValues('entity_id');
+        }
+
+        return $productIds;
+    }
+
+    /**
+     * @param string $type
+     * @param mixed $ids
+     * @return string[]
+     */
+    private function flushById(string $type, $ids)
+    {
+        if (is_string($ids)) {
+            $ids = array_map(function ($id) {
+                return intval(trim($id));
+            }, explode(',', $ids));
+        }
+
+        $tags = array_map(function ($productId) use ($type) {
+            return 'catalog_' . $type . '_' . $productId;
+        }, $ids);
+
+        if (count($tags)) {
+            try {
+                $this->appCache->clean($tags);
+                return [
+                    'code' => '200',
+                    'message' => 'Cache clean successfully',
+                ];
+            } catch (Exception $e) {
+                return [
+                    'code' => '500',
+                    'message' => 'Could not clean cache; ' . $e->getMessage(),
+                ];
+            }
+        } else {
+            return [
+                'code' => '304',
+                'message' => 'No tags to clean',
             ];
         }
     }

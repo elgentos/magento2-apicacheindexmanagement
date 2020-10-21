@@ -4,6 +4,7 @@ namespace Elgentos\ApiCacheIndexManagement\Model;
 use Elgentos\ApiCacheIndexManagement\Api\ReindexInterface;
 use Exception;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
+use Magento\Framework\App\Request\Http;
 use Magento\Framework\Indexer\ConfigInterface;
 use Magento\Indexer\Model\Indexer;
 use Magento\Indexer\Model\Processor;
@@ -24,6 +25,10 @@ class Reindexer implements ReindexInterface
      */
     public $productCollectionFactory;
     /**
+     * @var Http
+     */
+    public $request;
+    /**
      * @var Processor
      */
     protected $processor;
@@ -32,15 +37,18 @@ class Reindexer implements ReindexInterface
      * @param Processor $processor
      * @param ConfigInterface $indexerConfig
      * @param CollectionFactory $productCollectionFactory
+     * @param Http $request
      */
     public function __construct(
         Processor $processor,
         ConfigInterface $indexerConfig,
-        CollectionFactory $productCollectionFactory
+        CollectionFactory $productCollectionFactory,
+        Http $request
     ) {
         $this->processor = $processor;
         $this->indexerConfig = $indexerConfig;
         $this->productCollectionFactory = $productCollectionFactory;
+        $this->request = $request;
     }
 
     /**
@@ -50,16 +58,22 @@ class Reindexer implements ReindexInterface
      */
     public function reindex(string $indexName)
     {
-        return $this->reindexById($indexName);
+        if ($this->request->getPostValue('ids')) {
+            return $this->reindexById($indexName, $this->request->getPostValue('ids'));
+        } elseif ($this->request->getPostValue('skus')) {
+            return $this->reindexBySku($indexName, $this->request->getPostValue('skus'));
+        } else {
+            return $this->reindexById($indexName);
+        }
     }
 
     /**
      * @param string $indexName
-     * @param string $ids
+     * @param mixed $ids
      * @return string[]
      * @throws Throwable
      */
-    public function reindexById(string $indexName, string $ids = '')
+    private function reindexById(string $indexName, $ids)
     {
         try {
             if (is_string($ids)) {
@@ -92,11 +106,11 @@ class Reindexer implements ReindexInterface
 
     /**
      * @param string $indexName
-     * @param string $skus
+     * @param mixed $skus
      * @return string[]
      * @throws Throwable
      */
-    public function reindexBySku(string $indexName, string $skus = '')
+    private function reindexBySku(string $indexName, $skus)
     {
         if (is_string($skus)) {
             $skus = array_map(function ($id) {

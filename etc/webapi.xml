@@ -1,70 +1,52 @@
 <?xml version="1.0"?>
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
     <!-- For Index Management -->
-    <route url="/V1/index/reindexAll" method="GET">
+    <route url="/V1/index/reindexAll" method="POST">
         <service class="Elgentos\ApiCacheIndexManagement\Api\ReindexInterface" method="reindexAll" />
         <resources>
             <resource ref="Elgentos_ApiCacheIndexManagement::index" />
         </resources>
     </route>
-    <route url="/V1/index/reindexAllInvalidated" method="GET">
+    <route url="/V1/index/reindexAllInvalidated" method="POST">
         <service class="Elgentos\ApiCacheIndexManagement\Api\ReindexInterface" method="reindexAllInvalidated" />
         <resources>
             <resource ref="Elgentos_ApiCacheIndexManagement::index" />
         </resources>
     </route>
-    <route url="/V1/index/reindex/:indexName" method="GET">
+    <route url="/V1/index/reindex/:indexName" method="POST">
         <service class="Elgentos\ApiCacheIndexManagement\Api\ReindexInterface" method="reindex" />
-        <resources>
-            <resource ref="Elgentos_ApiCacheIndexManagement::index" />
-        </resources>
-    </route>
-    <route url="/V1/index/reindex/:indexName/ids/:ids" method="GET">
-        <service class="Elgentos\ApiCacheIndexManagement\Api\ReindexInterface" method="reindexById" />
-        <resources>
-            <resource ref="Elgentos_ApiCacheIndexManagement::index" />
-        </resources>
-    </route>
-    <route url="/V1/index/reindex/:indexName/skus/:skus" method="GET">
-        <service class="Elgentos\ApiCacheIndexManagement\Api\ReindexInterface" method="reindexBySku" />
         <resources>
             <resource ref="Elgentos_ApiCacheIndexManagement::index" />
         </resources>
     </route>
 
     <!-- For Cache Management -->
-    <route url="/V1/cache/flushAll" method="GET">
+    <route url="/V1/cache/flushAll" method="POST">
         <service class="Elgentos\ApiCacheIndexManagement\Api\CacheInterface" method="flushAll" />
         <resources>
             <resource ref="Elgentos_ApiCacheIndexManagement::cache" />
         </resources>
     </route>
-    <route url="/V1/cache/flushAllInvalidated" method="GET">
+    <route url="/V1/cache/flushAllInvalidated" method="POST">
         <service class="Elgentos\ApiCacheIndexManagement\Api\CacheInterface" method="flushAllInvalidated" />
         <resources>
             <resource ref="Elgentos_ApiCacheIndexManagement::cache" />
         </resources>
     </route>
-    <route url="/V1/cache/flush/:cacheType" method="GET">
+    <route url="/V1/cache/flush/:cacheType" method="POST">
         <service class="Elgentos\ApiCacheIndexManagement\Api\CacheInterface" method="flush" />
         <resources>
             <resource ref="Elgentos_ApiCacheIndexManagement::cache" />
         </resources>
     </route>
-    <route url="/V1/cache/flush/product/ids/:ids" method="GET">
-        <service class="Elgentos\ApiCacheIndexManagement\Api\CacheInterface" method="flushProductsById" />
+    <route url="/V1/cache/flush/products" method="POST">
+        <service class="Elgentos\ApiCacheIndexManagement\Api\CacheInterface" method="flushProducts" />
         <resources>
             <resource ref="Elgentos_ApiCacheIndexManagement::cache" />
         </resources>
     </route>
-    <route url="/V1/cache/flush/product/skus/:skus" method="GET">
-        <service class="Elgentos\ApiCacheIndexManagement\Api\CacheInterface" method="flushProductsBySku" />
-        <resources>
-            <resource ref="Elgentos_ApiCacheIndexManagement::cache" />
-        </resources>
-    </route>
-    <route url="/V1/cache/flush/category/ids/:ids" method="GET">
-        <service class="Elgentos\ApiCacheIndexManagement\Api\CacheInterface" method="flushCategoriesById" />
+    <route url="/V1/cache/flush/categories" method="POST">
+        <service class="Elgentos\ApiCacheIndexManagement\Api\CacheInterface" method="flushCategories" />
         <resources>
             <resource ref="Elgentos_ApiCacheIndexManagement::cache" />
         </resources>

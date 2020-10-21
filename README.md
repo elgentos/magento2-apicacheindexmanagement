@@ -1,18 +1,16 @@
 # Elgentos ApiCacheIndexManagement
 
-Extension to invalidate caches and reindex indexers through the REST API.
+Extension to invalidate caches and reindex indexers through the REST API. All routes are POST routes.
 
-Both `{ids}` and `{skus}` are comma-separated strings.
+Both `{ids}` and `{skus}` can be passed as comma-separated strings or arrays.
 
 ## Cache routes
 
 ```
 /V1/cache/flushAll
 /V1/cache/flushAllInvalidated
-/V1/cache/flush/{cacheType}
-/V1/cache/flush/product/ids/{ids}
-/V1/cache/flush/product/skus/{skus}
-/V1/cache/flush/category/ids/{ids}
+/V1/cache/flush/products (parameters; ids / skus)
+/V1/cache/flush/categories (parameters; ids / skus)
 ```
 
 Possible `cacheTypes`;
@@ -41,9 +39,7 @@ There could be more or less cache types, depending on your installation. See `bi
 ```
 /V1/index/reindexAll
 /V1/index/reindexAllInvalidated
-/V1/index/reindex/{indexName}
-/V1/index/reindex/{indexName}/ids/{ids}
-/V1/index/reindex/{indexName}/skus/{skus}
+/V1/index/reindex/{indexName} (optional parameters; ids / skus)
 ```
 
 Possible `indexNames`:
