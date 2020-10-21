@@ -9,6 +9,7 @@ Both `{ids}` and `{skus}` can be passed as comma-separated strings or arrays.
 ```
 /V1/cache/flushAll
 /V1/cache/flushAllInvalidated
+/V1/cache/flush/{cacheType}
 /V1/cache/flush/products (parameters; ids / skus)
 /V1/cache/flush/categories (parameters; ids / skus)
 ```
