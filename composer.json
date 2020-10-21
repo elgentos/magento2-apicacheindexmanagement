@@ -1,0 +1,22 @@
+{
+    "name": "elgentos/magento2-apicacheindexmanagement",
+    "description": "Extension to invalidate caches and reindex indexers through the REST API.",
+    "type": "magento2-module",
+    "license": "OSL-3.0",
+    "authors": [
+        {
+            "email": "peterjaap@elgentos.nl",
+            "name": "Peter Jaap Blaakmeer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "files": [
+          "registration.php"
+        ],
+        "psr-4": {
+            "Elgentos\\ApiCacheIndexManagement\\": ""
+        }
+    }
+}

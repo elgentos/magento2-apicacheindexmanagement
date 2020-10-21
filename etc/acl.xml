@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Elgentos_ApiCacheIndexManagement::cacheIndex" sortOrder="10" title="Api Cache Index Management">
+                    <resource id="Elgentos_ApiCacheIndexManagement::cache" sortOrder="10" title="Flush Caches"/>
+                    <resource id="Elgentos_ApiCacheIndexManagement::index" sortOrder="10" title="Reindex Indexes"/>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>
