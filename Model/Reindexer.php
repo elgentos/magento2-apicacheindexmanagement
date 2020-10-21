@@ -100,7 +100,7 @@ class Reindexer implements ReindexInterface
     {
         if (is_string($skus)) {
             $skus = array_map(function ($id) {
-                return intval(trim($id));
+                return trim($id);
             }, explode(',', $skus));
         }
 
