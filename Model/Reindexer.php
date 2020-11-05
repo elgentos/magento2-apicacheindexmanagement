@@ -5,10 +5,10 @@ use Elgentos\ApiCacheIndexManagement\Api\ReindexInterface;
 use Exception;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Framework\App\Request\Http;
-use Magento\Framework\Indexer\ConfigInterface;
 use Magento\Indexer\Model\Indexer;
 use Magento\Indexer\Model\Processor;
 use Throwable;
+use \Magento\Framework\Indexer\IndexerInterfaceFactory;
 
 /**
  * Class Reindexer
@@ -16,10 +16,6 @@ use Throwable;
  */
 class Reindexer implements ReindexInterface
 {
-    /**
-     * @var ConfigInterface
-     */
-    public $indexerConfig;
     /**
      * @var CollectionFactory
      */
@@ -32,23 +28,27 @@ class Reindexer implements ReindexInterface
      * @var Processor
      */
     protected $processor;
+    /**
+     * @var IndexerInterfaceFactory
+     */
+    protected $indexerFactory;
 
     /**
      * @param Processor $processor
-     * @param ConfigInterface $indexerConfig
      * @param CollectionFactory $productCollectionFactory
      * @param Http $request
+     * @param IndexerInterfaceFactory $indexerFactory
      */
     public function __construct(
         Processor $processor,
-        ConfigInterface $indexerConfig,
         CollectionFactory $productCollectionFactory,
-        Http $request
+        Http $request,
+        IndexerInterfaceFactory $indexerFactory
     ) {
         $this->processor = $processor;
-        $this->indexerConfig = $indexerConfig;
         $this->productCollectionFactory = $productCollectionFactory;
         $this->request = $request;
+        $this->indexerFactory = $indexerFactory;
     }
 
     /**
@@ -73,7 +73,7 @@ class Reindexer implements ReindexInterface
      * @return string[]
      * @throws Throwable
      */
-    private function reindexById(string $indexName, $ids)
+    private function reindexById(string $indexName, $ids = null)
     {
         try {
             if (is_string($ids)) {
@@ -83,7 +83,7 @@ class Reindexer implements ReindexInterface
             }
 
             /** @var Indexer $indexer */
-            $indexer = $this->indexerConfig->getIndexer($indexName);
+            $indexer = $this->indexerFactory->create()->load($indexName);
             if (!is_array($ids)) {
                 $indexer->reindexAll();
             } else {
@@ -94,12 +94,12 @@ class Reindexer implements ReindexInterface
                 'code' => '200',
                 'message' => 'Indexers are reindexed successfully',
             ];
+            return $response;
         } catch (Exception $e) {
             $response = [
                 'code' => '500',
                 'message' => 'Could not reindex ' . $indexName . '; ' . $e->getMessage(),
             ];
-        } finally {
             return $response;
         }
     }
